@@ -1,12 +1,13 @@
 <template>
 
-  <button type="button" @click="vid_play_pause()">Play/Pause</button>
-  <button type="button" @click="currentFrame()">frame?</button>
+  <!-- <button type="button" @click="vid_play_pause()">Play/Pause</button>
+  <button type="button" @click="currentFrame()">frame?</button> -->
   <div class="container">
+
     <!-- <canvas class="canvas" id="myCanvas" width="1520" height="720"></canvas> -->
     <svg id="mySvg" width="1520" height="720">
     </svg>
-    <video class="video" id="myVideo" src="../src/assets/20220408155705.webm" width="1520" height="720"></video>
+    <video autoplay="true" class="video" id="myVideo" src="../src/assets/20220408155705.webm" width="1520" height="720" ></video>
   </div>
   
 </template>
@@ -137,6 +138,10 @@ export default {
     let posInGrid = this.initPosInGrid(this.gridX,this.gridY)
     posInGrid = this.calPosInGrid(posInGrid,this.gridX,this.gridY,dataArray1.length,dataArray2,this.width,this.height)
     this.maxNum = this.findMax(posInGrid,this.gridX)
+    console.log(this.maxNum)
+    let mapOpacity = d3.scaleLinear()
+      .domain([0,1])
+      .range([0.1,1])
     
     for(let i=0; i<this.gridX; i++){
       for(let j=0; j<this.gridY; j++){
@@ -145,13 +150,19 @@ export default {
           .attr("y",j*this.height/this.gridY)
           .attr("width", this.width/this.gridX)
           .attr("height", this.height/this.gridY)
-          .style("fill", "red")
-          .style("opacity", posInGrid[i][j]/this.maxNum*100)
-          .style("mix-blend-mode", "multiply")
+          .style("fill", "#FFA500")
+          .style("opacity", ()=>{
+            if(posInGrid[i][j]/this.maxNum != 0){
+              return mapOpacity(posInGrid[i][j]/this.maxNum)
+            } else {
+              return 0
+            }
+          })
+          .style("mix-blend-mode", "screen")
         console.log(posInGrid[i][j]/this.maxNum)
       }
     }
-
+    document.querySelector('video').playbackRate = 10;
     
   },
     
@@ -169,7 +180,8 @@ export default {
   margin-top: 60px;
 }
 .container {
-    position: relative;
+  
+    position:relative;
   }
 #mySvg {
   position: absolute;
